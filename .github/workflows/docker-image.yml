@@ -71,12 +71,14 @@ jobs:
         context: .
         #push: ${{ github.event_name != 'pull_request' }}
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1:main
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        #tags: ${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1:main
+        #labels: ${{ steps.meta.outputs.labels }}
         #provenance: true
         #builder: ${{ steps.buildx.outputs.name }}  # Use the Buildx builder 
         provenance: true
-        outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1,push=true
+        #outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1,push=true
 
     - name: Output image
       id: image
