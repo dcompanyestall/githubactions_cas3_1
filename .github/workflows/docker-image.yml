@@ -32,7 +32,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      image: ${{ env.IMAGE_NAME }}
+      #image: ${{ env.IMAGE_NAME }}
+      image: ${{ steps.image.outputs.image }}
       digest: ${{ steps.build-push.outputs.digest }}
     
 
@@ -76,6 +77,14 @@ jobs:
         #builder: ${{ steps.buildx.outputs.name }}  # Use the Buildx builder 
         provenance: true
         outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1,push=true
+
+    - name: Output image
+      id: image
+      run: |
+          # NOTE: Set the image as an output because the `env` context is not
+          # available to the inputs of a reusable workflow call.
+          image_name="${IMAGE_REGISTRY}/${IMAGE_NAME}"
+          echo "image=$image_name" >> "$GITHUB_OUTPUT"
 
     - name: Capture image digest
       run: echo "IMAGE_DIGEST=${{ steps.build-push.outputs.digest }}" >> $GITHUB_ENV
