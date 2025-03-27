@@ -29,11 +29,10 @@ env:
 
 jobs:
 
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      #image: ${{ env.IMAGE_NAME }}
-      image: ${{ steps.image.outputs.image }}
+      image: ${{ env.IMAGE_NAME }}
       digest: ${{ steps.build-push.outputs.digest }}
     
 
@@ -52,12 +51,11 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         #images: ${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1
-        images: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
-        #images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-        #tags: |
-          #type=semver,pattern={{version}}
-          #type=sha  # Tags the image with the commit SHA
-          #type=ref,event=branch  # Tags the image with the branch name
+        images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=semver,pattern={{version}}
+          type=sha  # Tags the image with the commit SHA
+          type=ref,event=branch  # Tags the image with the branch name
          
     - name: Set up Buildx
       id: buildx
@@ -72,39 +70,29 @@ jobs:
         context: .
         #push: ${{ github.event_name != 'pull_request' }}
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1:main
         labels: ${{ steps.meta.outputs.labels }}
-        #tags: ${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1:main
-        #labels: ${{ steps.meta.outputs.labels }}
         #provenance: true
         #builder: ${{ steps.buildx.outputs.name }}  # Use the Buildx builder 
         provenance: true
         outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1,push=true
-
-    - name: Output image
-      id: image
-      run: |
-          # NOTE: Set the image as an output because the `env` context is not
-          # available to the inputs of a reusable workflow call.
-          image_name="${IMAGE_REGISTRY}/${IMAGE_NAME}"
-          echo "image=$image_name" >> "$GITHUB_OUTPUT"
 
     - name: Capture image digest
       run: echo "IMAGE_DIGEST=${{ steps.build-push.outputs.digest }}" >> $GITHUB_ENV
         
   provenance:
     name: Generate SLSA Provenance
-    needs: [build]
+    needs: [build-and-push]
     permissions:
         actions: read # for detecting the Github Actions environment.
         id-token: write # for creating OIDC tokens for signing.
-        packages: write # for uploading attestations.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
+        packages: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
     with:
-      image: ${{ needs.build.outputs.image }}
-      #image: dcompanyestall/githubactions_cas3_1
+      #image: ${{ needs.build-and-push.outputs.image }}
+      image: dcompanyestall/githubactions_cas3_1
       #image: dcompanyestall/${{ needs.build-and-push.outputs.image }}
-      digest: ${{ needs.build.outputs.digest }}
+      digest: ${{ needs.build-and-push.outputs.digest }}
     secrets:
       registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
       registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -112,7 +100,7 @@ jobs:
   #Intento fer que això funcioni
   upload-provenance:
     runs-on: ubuntu-latest
-    needs: [build,provenance]
+    needs: [build-and-push,provenance]
     steps:
     - name: Install Cosign
       run: |
