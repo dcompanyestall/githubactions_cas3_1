@@ -54,10 +54,10 @@ jobs:
         #images: ${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1
         images: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
         #images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=semver,pattern={{version}}
-          type=sha  # Tags the image with the commit SHA
-          type=ref,event=branch  # Tags the image with the branch name
+        #tags: |
+          #type=semver,pattern={{version}}
+          #type=sha  # Tags the image with the commit SHA
+          #type=ref,event=branch  # Tags the image with the branch name
          
     - name: Set up Buildx
       id: buildx
