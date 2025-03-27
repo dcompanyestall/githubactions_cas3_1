@@ -29,7 +29,7 @@ env:
 
 jobs:
 
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     outputs:
       #image: ${{ env.IMAGE_NAME }}
@@ -91,17 +91,17 @@ jobs:
         
   provenance:
     name: Generate SLSA Provenance
-    needs: [build-and-push]
+    needs: [build]
     permissions:
         actions: read # for detecting the Github Actions environment.
         id-token: write # for creating OIDC tokens for signing.
-        packages: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+        packages: write # for uploading attestations.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
     with:
-      #image: ${{ needs.build-and-push.outputs.image }}
-      image: dcompanyestall/githubactions_cas3_1
+      image: ${{ needs.build.outputs.image }}
+      #image: dcompanyestall/githubactions_cas3_1
       #image: dcompanyestall/${{ needs.build-and-push.outputs.image }}
-      digest: ${{ needs.build-and-push.outputs.digest }}
+      digest: ${{ needs.build.outputs.digest }}
     secrets:
       registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
       registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -109,7 +109,7 @@ jobs:
   #Intento fer que això funcioni
   upload-provenance:
     runs-on: ubuntu-latest
-    needs: [build-and-push,provenance]
+    needs: [build,provenance]
     steps:
     - name: Install Cosign
       run: |
