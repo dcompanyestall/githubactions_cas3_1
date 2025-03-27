@@ -78,7 +78,7 @@ jobs:
         #provenance: true
         #builder: ${{ steps.buildx.outputs.name }}  # Use the Buildx builder 
         provenance: true
-        #outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1,push=true
+        outputs: type=image,name=${{ secrets.DOCKERHUB_USERNAME }}/githubactions_cas3_1,push=true
 
     - name: Output image
       id: image
