@@ -91,10 +91,10 @@ jobs:
         packages: write
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
     with:
-      image: ${{ needs.build-push.outputs.image }}
-      #image: dcompanyestall/githubactions_cas3_1
+      #image: ${{ needs.build-push.outputs.image }}
+      image: dcompanyestall/githubactions_cas3_1
       #image: dcompanyestall/${{ needs.build-and-push.outputs.image }}
-      digest: ${{ needs.build-push.outputs.digest }}
+      digest: ${{ needs.build-and-push.outputs.digest }}
     secrets:
       registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
       registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
