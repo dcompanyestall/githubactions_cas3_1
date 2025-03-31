@@ -84,7 +84,7 @@ jobs:
         
   provenance:
     name: Generate SLSA Provenance
-    needs: [build-and-push]
+    needs: [build]
     permissions:
         actions: read # for detecting the Github Actions environment.
         id-token: write # for creating OIDC tokens for signing.
