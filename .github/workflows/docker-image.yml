@@ -29,7 +29,7 @@ env:
 
 jobs:
 
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     outputs:
       image: ${{ env.IMAGE_NAME }}
@@ -94,7 +94,7 @@ jobs:
       #image: ${{ needs.build-push.outputs.image }}
       image: dcompanyestall/githubactions_cas3_1
       #image: dcompanyestall/${{ needs.build-and-push.outputs.image }}
-      digest: ${{ needs.build-and-push.outputs.digest }}
+      digest: ${{ needs.build.outputs.digest }}
     secrets:
       registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
       registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
