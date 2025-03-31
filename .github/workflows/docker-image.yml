@@ -32,8 +32,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      #image: ${{ env.IMAGE_NAME }}
-      image: ${{ steps.image.outputs.image }}
+      image: ${{ env.IMAGE_NAME }}
       digest: ${{ steps.build-push.outputs.digest }}
     
 
@@ -82,14 +81,6 @@ jobs:
 
     - name: Capture image digest
       run: echo "IMAGE_DIGEST=${{ steps.build-push.outputs.digest }}" >> $GITHUB_ENV
-
-    - name: Output image
-      id: image
-      run: |
-          # NOTE: Set the image as an output because the `env` context is not
-          # available to the inputs of a reusable workflow call.
-          image_name="${IMAGE_REGISTRY}/${IMAGE_NAME}"
-          echo "image=$image_name" >> "$GITHUB_OUTPUT"
         
   provenance:
     name: Generate SLSA Provenance
@@ -100,8 +91,8 @@ jobs:
         packages: write
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
     with:
-      image: ${{ needs.build.outputs.image }}
-      #image: dcompanyestall/githubactions_cas3_1
+      #image: ${{ needs.build.outputs.image }}
+      image: dcompanyestall/githubactions_cas3_1
       #image: dcompanyestall/${{ needs.build-and-push.outputs.image }}
       digest: ${{ needs.build.outputs.digest }}
     secrets:
